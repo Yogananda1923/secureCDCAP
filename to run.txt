@@ -1,0 +1,43 @@
+Option 1: One-Click Startup (Recommended)
+On Windows:
+
+Navigate to C:\Users\yogan\Desktop\cd cap in File Explorer or Command Prompt:
+
+Launch Full Platform (Backend + Frontend together):
+
+cmd
+start_all.bat
+
+(This automatically opens two terminal windows: one running the FastAPI backend at http://127.0.0.1:8000 and one running the React frontend at http://localhost:5173.)
+
+Or launch individually:
+
+cmd
+start_backend.bat
+start_frontend.bat
+On Linux / macOS:
+bash
+cd "C:/Users/yogan/Desktop/cd cap"
+chmod +x start_*.sh
+./start_all.sh
+Option 2: Manual Terminal Commands
+Terminal 1: Start Backend (FastAPI)
+powershell
+cd "C:\Users\yogan\Desktop\cd cap\backend"
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+Backend API: http://127.0.0.1:8000
+Interactive Swagger Documentation: http://127.0.0.1:8000/docs
+Terminal 2: Start Frontend (Vite + React)
+powershell
+cd "C:\Users\yogan\Desktop\cd cap\frontend"
+npm.cmd run dev
+Web Interface: http://localhost:5173
+To Run the Automated Test Suite (Pytest)
+
+In the backend directory, run:
+
+powershell
+cd "C:\Users\yogan\Desktop\cd cap\backend"
+python -m pytest tests/test_compiler.py -v
+
+(All 9 test suites validate AST parsing, semantic analysis, IR/CFG generation, vulnerability detection, verified code transformations, and the 31 pre-built benchmarks).
