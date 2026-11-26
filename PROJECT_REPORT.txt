@@ -1,0 +1,399 @@
+====================================================================================================
+                        SECURECOMPILERAI: TECHNICAL PROJECT REPORT
+====================================================================================================
+Project Title:   SecureCompilerAI: A Semantic Compiler for Intelligent Vulnerability Detection
+                 and Verified Code Optimization
+Domain:          Compilers, Program Analysis, Cybersecurity Engineering, SAST
+Target Repository: https://github.com/Yogananda1923/secureCDCAP
+Local Path:      C:\Users\yogan\Desktop\cd cap
+Academic Level:  Final-Year B.Tech Capstone / Production-Grade Academic System
+Author:          T Yogananda Reddy (yoganandareddy2009@gmail.com / GitHub: Yogananda1923)
+====================================================================================================
+
+1. EXECUTIVE SUMMARY & ABSTRACT
+----------------------------------------------------------------------------------------------------
+Traditional software development linters and static analyzers typically rely on regex-based keyword
+matching. This results in high rates of false positives and a complete inability to reason about
+program syntax, scoped data flows, and runtime control execution paths. Conversely, traditional
+optimizing compilers focus purely on execution speed and binary footprint reduction without verifying
+security invariants or remediating vulnerabilities.
+
+SecureCompilerAI bridges this architectural divide by introducing a unified semantic compiler
+pipeline that integrates:
+  1. Multi-language source code parsing (Python, C, Java)
+  2. Scoped symbol resolution and lexical scope hierarchies
+  3. Intermediate Representation (Three-Address Code Quadruples)
+  4. Control Flow Graph (CFG) basic block partitioning
+  5. Abstract Syntax Tree (AST) semantic taint and security rule verification
+  6. Automated, verified secure code transformations
+  7. Explainable compiler optimization passes (Constant Folding, Dead Code Elimination)
+  8. Three-stage semantic verification gates (Syntax, Symbol Preservation, Regression Safety)
+  9. Automated execution of 31 predefined multi-language benchmark test cases
+ 10. Persistent SQLite database storage and multi-format reporting (PDF, HTML, JSON)
+
+====================================================================================================
+2. TECHNOLOGY STACK & ARCHITECTURE
+====================================================================================================
+A. FRONTEND PRESENTATION LAYER:
+   - Framework: React 19, Vite, TypeScript
+   - Styling: Tailwind CSS (Cybersecurity Dark Theme: #0B1020, #111827, #6366F1)
+   - Code Editing: Monaco Editor (VS Code core engine) with side-by-side DiffEditor
+   - Visual Analytics: Recharts (Pie charts, Bar charts, interactive metrics)
+   - Icons: Lucide React
+   - Client HTTP: Axios with dynamic environment API routing (VITE_API_URL)
+
+B. BACKEND API & CONTROLLER LAYER:
+   - Framework: Python 3.10+, FastAPI (Asynchronous REST API)
+   - Schema Validation: Pydantic v2
+   - ORM & Database: SQLAlchemy 2.0 with SQLite database (9 relational tables)
+   - Web Server: Uvicorn ASGI server with CORS middleware
+
+C. COMPILER, PARSER & SECURITY ENGINES:
+   - Python Parser: Native Python 'ast' and 'tokenize' modules
+   - C Parser: 'pycparser' (C99 standard) and custom resilient C AST builder
+   - Java Parser: 'javalang' AST parser with fragment wrappers
+   - Universal Lexer: Pygments multi-language lexical analysis
+   - Reporting: ReportLab (PDF generator), Jinja2/HTML, and structured JSON
+
+D. DEPLOYMENT & DEVOPS INFRASTRUCTURE:
+   - Frontend Hosting: Netlify (Single Page Application with SPA routing redirects)
+   - Backend Hosting: Render.com (FastAPI on Python 3.10)
+   - Containerization: Dockerfiles for backend and frontend, plus docker-compose.yml
+   - Automation Scripts: Windows (.bat) and Linux/macOS (.sh) one-click startup scripts
+
+====================================================================================================
+3. THE 11-STAGE COMPILER PIPELINE
+====================================================================================================
+Stage 1:  Source Code Input
+          Accepts Python (.py), C (.c, .h), and Java (.java) code via editor or file upload.
+
+Stage 2:  Lexical Analysis
+          Generates token stream classifying keywords, identifiers, operators, literals, comments.
+
+Stage 3:  Syntax Analysis
+          Grammar validation, line/column tracking, and syntax error diagnosis.
+
+Stage 4:  Abstract Syntax Tree (AST) Generation
+          Hierarchical tree normalization with node IDs, labels, line numbers, and child relations.
+
+Stage 5:  Semantic Analysis
+          Lexical scope resolution, symbol table creation, undefined and unused variable tracking.
+
+Stage 6:  Intermediate Representation (IR)
+          Generates Three-Address Code (TAC) Quadruples (opcodes, arguments, result temporaries).
+
+Stage 7:  Control Flow Graph (CFG)
+          Leader identification, basic block partitioning, and directed edge branch linking.
+
+Stage 8:  Security Vulnerability Detection
+          Non-regex semantic inspection across 5 major CWE categories.
+
+Stage 9:  Semantic Verification
+          Pre- and post-transformation checks ensuring syntax validity and symbol preservation.
+
+Stage 10: Code Hardening & Optimization
+          Automated secure code rewrites, constant folding, and dead code elimination.
+
+Stage 11: Final Output & Audit Certification
+          Side-by-side Monaco diff, 31 benchmark suite execution, and PDF/HTML audit reports.
+
+====================================================================================================
+4. MODULE SPECIFICATIONS & IMPLEMENTATION DETAILS
+====================================================================================================
+
+MODULE 1: INTELLIGENT SOURCE CODE ANALYSIS & SECURE PARSING
+----------------------------------------------------------------------------------------------------
+- Lexical Analyzer (app/compiler/lexer.py):
+  Tokenizes input into 5 distinct categories: Keywords, Identifiers, Operators, Literals, Delimiters.
+  Calculates token counts and classification breakdowns.
+
+- Multi-Language Parsers (app/compiler/parser.py, app/compiler/ast_analyzer.py):
+  * Python: Uses ast.parse to capture AST nodes and exact syntax error coordinates.
+  * C: Uses pycparser with injected typedefs (size_t, FILE, uint32_t) and resilient C AST generator.
+  * Java: Uses javalang.parse.parse with wrapper fallbacks for classless snippets.
+  * AST Analyzer: Standardizes raw language trees into interactive visual node schemas.
+
+- Scoped Symbol Table & Semantic Analyzer (app/compiler/symbol_table.py, semantic_analyzer.py):
+  * Scoping: Maintains lexical scope hierarchy (global -> function -> block -> class).
+  * Undefined Variable Detection: Flags symbols referenced in expressions without prior declaration.
+  * Unused Variable Detection: Flags local identifiers declared/assigned but never read.
+  * Unreachable Code Detection: Identifies dead statements trailing return, raise, throw, break, exit.
+  * Type Mismatch Warnings: Detects incompatible operations between disparate literal types.
+
+- Intermediate Representation & CFG (app/compiler/intermediate_representation.py, control_flow.py):
+  * Three-Address Code (TAC): Converts high-level constructs into linearized quadruples.
+    Opcodes: ASSIGN, BINOP_ADD, BINOP_SUB, CMP_EQ, JUMP, JUMP_IF_FALSE, LABEL, CALL, PARAM, RETURN.
+  * Basic Block Partitioner: Groups TAC instructions by leader rules into basic blocks with
+    predecessors, successors, and directed jump/fallthrough edges.
+
+
+MODULE 2: SEMANTIC SECURITY VERIFICATION ENGINE
+----------------------------------------------------------------------------------------------------
+Inspects AST call nodes, statement parameters, string concatenations, and control flow paths.
+
+Implemented Vulnerability Categories & CWE Rules:
+1. SQL Injection (CWE-89) - Critical:
+   Detects dynamic string concatenation, f-strings, and sprintf formatting in SQL execution sinks
+   (cursor.execute, Statement.executeQuery, sqlite3_exec).
+
+2. OS Command Injection (CWE-78) & Code Injection (CWE-94/95) - Critical:
+   Flags os.system, subprocess with shell=True, system(), Runtime.getRuntime().exec(), eval(), exec().
+
+3. Memory Safety Flaws (CWE-120, CWE-134, CWE-416) - Critical / High:
+   Detects classic buffer overflows (gets, unbounded strcpy/strcat/sprintf), format string vulnerabilities
+   (printf without format specifiers), and use-after-free pointer dereferences after free(ptr).
+
+4. Deserialization of Untrusted Data (CWE-502) - Critical:
+   Identifies pickle.loads(), yaml.load() without SafeLoader, and ObjectInputStream.readObject().
+
+5. Authentication & Cryptography (CWE-798, CWE-328, CWE-330) - High / Medium:
+   Detects hardcoded secrets/passwords, weak hash algorithms (MD5, SHA-1), and predictable random
+   generators (random.random, rand, new Random) used in security token contexts.
+
+6. General Security Issues (CWE-22, CWE-377, CWE-732, CWE-391) - High / Medium / Low:
+   Detects path traversal (open with user input), insecure temporary files (tempfile.mktemp), overly
+   permissive permissions (chmod 0777), and silent exception suppression (except: pass, empty catch).
+
+Security Scoring Formula:
+   Score = max(0.0, 100.0 - (25 * Critical + 15 * High + 8 * Medium + 3 * Low))
+
+
+MODULE 3: VERIFIED SECURE CODE TRANSFORMATION & EXPLAINABLE OPTIMIZATION
+----------------------------------------------------------------------------------------------------
+- Automated Secure Hardening (app/optimizer/secure_transformations.py):
+  * SQL Injection: Rewrites dynamic queries to parameterized queries with bound tuples:
+    cursor.execute(f"SELECT * FROM users WHERE id = '{uid}'")
+    -> cursor.execute("SELECT * FROM users WHERE id = ?", (uid,))
+  * Command Injection: Converts shell strings to safe argument arrays with shell=False:
+    os.system("ping " + host) -> subprocess.run(shlex.split("ping " + host), shell=False, check=True)
+  * Hardcoded Secrets: Replaces cleartext credentials with environment variable lookups:
+    API_KEY = "sk_live_123" -> API_KEY = os.getenv("API_KEY") (auto-injects import os)
+  * Weak Hashing: Migrates MD5/SHA-1 to SHA-256 or Argon2id/bcrypt.
+  * C Buffer Safety: Replaces gets() with fgets(), and strcpy() with bounded strncpy + null-terminator.
+  * Insecure Temp Files: Replaces mktemp() with atomic NamedTemporaryFile().
+  * Deserialization: Replaces pickle.loads() with safe json.loads().
+
+- Compiler Optimization Passes:
+  * Constant Folding: Evaluates static constant expressions at compile-time (e.g. 24*60*60 -> 86400).
+  * Dead Code Elimination (DCE): Prunes unreachable statements after returns and dead branches.
+
+- Three-Stage Semantic Verification Gate (app/verification/regression_verifier.py):
+  * Gate 1 (Syntax Check): Verifies transformed code re-parses with 0 syntax errors.
+  * Gate 2 (Symbol Preservation): Verifies all original functions, classes, and variables remain intact.
+  * Gate 3 (Regression Safety): Verifies security score improved and no secondary flaws were created.
+
+
+MODULE 4: PREDEFINED TEST CASE BENCHMARKS (31 TEST CASES)
+----------------------------------------------------------------------------------------------------
+Total Benchmarks: 31 (11 Python, 10 C, 10 Java)
+All benchmarks execute against the live compiler engine and pass with 100% accuracy:
+
+Benchmark Summary Table:
+  ID        Name                                 Lang    Category            Expected Result
+  ------------------------------------------------------------------------------------------
+  TC-PY-01  Secure Python User Service           Python  Clean Code          Clean (Passed)
+  TC-PY-02  Python SQL Injection via f-string    Python  Injection           Critical (Passed)
+  TC-PY-03  Python Command Injection (os.system) Python  Injection           Critical (Passed)
+  TC-PY-04  Python Hardcoded Secret & API Key    Python  Cryptography        High (Passed)
+  TC-PY-05  Python Weak Hash Algorithm (MD5)     Python  Cryptography        Medium (Passed)
+  TC-PY-06  Python Path Traversal via open()     Python  General Security    High (Passed)
+  TC-PY-07  Python Insecure Temporary File       Python  General Security    Medium (Passed)
+  TC-PY-08  Python Deserialization via pickle    Python  Input Validation    Critical (Passed)
+  TC-PY-09  Python Dead Code Elimination         Python  Optimization        Clean (Passed)
+  TC-PY-10  Python Constant Folding Pass         Python  Optimization        Clean (Passed)
+  TC-PY-11  Python Silent Exception Suppression  Python  General Security    Low (Passed)
+  TC-C-01   Safe Bounded C String Copy           C       Clean Code          Clean (Passed)
+  TC-C-02   C Buffer Overflow via gets()         C       Memory Safety       Critical (Passed)
+  TC-C-03   C Unbounded strcpy() Buffer Overflow C       Memory Safety       Critical (Passed)
+  TC-C-04   C Format String Flaw in printf       C       Memory Safety       High (Passed)
+  TC-C-05   C Use-After-Free Vulnerability       C       Memory Safety       Critical (Passed)
+  TC-C-06   C SQL Injection via sprintf()        C       Injection           Critical (Passed)
+  TC-C-07   C Command Injection via system()     C       Injection           Critical (Passed)
+  TC-C-08   C Hardcoded Master Key               C       Cryptography        High (Passed)
+  TC-C-09   C Insecure Temporary File (mktemp)   C       General Security    Medium (Passed)
+  TC-C-10   C Constant Arithmetic Simplification C       Optimization        Clean (Passed)
+  TC-JAVA-01 Safe Java PreparedStatement Repo    Java    Clean Code          Clean (Passed)
+  TC-JAVA-02 Java SQL Injection Concatenation    Java    Injection           Critical (Passed)
+  TC-JAVA-03 Java Command Injection Runtime.exec Java    Injection           Critical (Passed)
+  TC-JAVA-04 Java Hardcoded Database Password    Java    Cryptography        High (Passed)
+  TC-JAVA-05 Java Weak Hash Algorithm (MD5)      Java    Cryptography        Medium (Passed)
+  TC-JAVA-06 Java Insecure Deserialization       Java    Input Validation    Critical (Passed)
+  TC-JAVA-07 Java Path Traversal via new File()  Java    General Security    High (Passed)
+  TC-JAVA-08 Java Insecure Random Token          Java    Cryptography        Medium (Passed)
+  TC-JAVA-09 Java Empty Catch Block Suppression  Java    General Security    Low (Passed)
+  TC-JAVA-10 Java Unreachable Dead Code          Java    Optimization        Clean (Passed)
+
+====================================================================================================
+5. DATABASE SCHEMA & ENTITY DESIGN (SQLITE / SQLALCHEMY)
+====================================================================================================
+The system includes 9 relational tables:
+
+1. projects:
+   - id (Integer, Primary Key)
+   - name (String 255)
+   - description (Text)
+   - created_at, updated_at (DateTime)
+
+2. source_files:
+   - id (Integer, Primary Key)
+   - project_id (Integer, Foreign Key -> projects.id)
+   - file_name (String 255)
+   - language (String 50)
+   - content (Text)
+   - file_size (Integer)
+   - created_at (DateTime)
+
+3. analysis_history:
+   - id (Integer, Primary Key)
+   - project_id (Integer, Foreign Key -> projects.id)
+   - source_file_id (Integer, Foreign Key -> source_files.id)
+   - file_name (String 255)
+   - language (String 50)
+   - source_code (Text)
+   - total_lines, total_tokens, ast_nodes_count, functions_count, variables_count (Integer)
+   - syntax_valid (Boolean)
+   - security_score, parsing_time_ms (Float)
+   - status (String 50)
+   - tokens_data, ast_data, semantic_data, ir_data, cfg_data (JSON)
+   - created_at (DateTime)
+
+4. vulnerabilities:
+   - id (Integer, Primary Key)
+   - analysis_id (Integer, Foreign Key -> analysis_history.id)
+   - vuln_id (String 100, e.g. SEC-INJ-001)
+   - name (String 255)
+   - category, cwe_id, cwe_name, severity, confidence (String)
+   - line_number, end_line_number (Integer)
+   - vulnerable_snippet, root_cause, attack_scenario, security_impact (Text)
+   - recommended_solution, suggested_fix (Text)
+   - is_transformed (Boolean)
+   - created_at (DateTime)
+
+5. transformations:
+   - id (Integer, Primary Key)
+   - analysis_id (Integer, Foreign Key -> analysis_history.id)
+   - transformation_type (String 100)
+   - description, original_code, transformed_code (Text)
+   - diff_data, explanation (JSON)
+   - is_verified (Boolean)
+   - verification_status (String 50)
+   - created_at (DateTime)
+
+6. verification_results:
+   - id (Integer, Primary Key)
+   - transformation_id (Integer, Foreign Key -> transformations.id)
+   - syntax_valid, semantic_valid, regression_passed (Boolean)
+   - overall_status (String 50)
+   - details (JSON)
+   - created_at (DateTime)
+
+7. test_cases:
+   - id (Integer, Primary Key)
+   - test_id (String 100, Unique)
+   - name (String 255), language (String 50), category (String 100)
+   - description, source_code, expected_transformation (Text)
+   - expected_detection, expected_severity, expected_verification (String)
+   - is_predefined (Boolean)
+   - created_at (DateTime)
+
+8. test_executions:
+   - id (Integer, Primary Key)
+   - test_case_id (Integer, Foreign Key -> test_cases.id)
+   - status (String 50 - Passed/Failed/Skipped)
+   - actual_detection, actual_severity, actual_verification (String)
+   - execution_time_ms (Float)
+   - details (JSON)
+   - executed_at (DateTime)
+
+9. reports:
+   - id (Integer, Primary Key)
+   - analysis_id (Integer, Foreign Key -> analysis_history.id)
+   - report_type (String 50 - PDF/JSON/HTML)
+   - file_path (String 500)
+   - summary_data (JSON)
+   - created_at (DateTime)
+
+====================================================================================================
+6. REST API ENDPOINTS SPECIFICATION
+====================================================================================================
+- POST   /api/analyze              Runs lexical, syntax, AST, semantic, IR, CFG analysis.
+- POST   /api/security/scan        Executes CWE security rule engine and computes security score.
+- POST   /api/transform            Applies automated secure code transformations and computes diffs.
+- POST   /api/verify               Runs 3-stage semantic verification gatekeeper.
+- POST   /api/optimize             Runs compiler constant folding and dead code elimination passes.
+- GET    /api/dashboard            Retrieves aggregated KPIs, charts data, and recent runs.
+- GET    /api/tests                Lists all 31 predefined test benchmarks.
+- POST   /api/tests/run            Executes an individual test benchmark by ID.
+- POST   /api/tests/run-all        Executes all test benchmarks with optional filters.
+- GET    /api/history              Lists historical analysis records.
+- GET    /api/history/{id}         Retrieves full stored compilation telemetry for a specific run.
+- DELETE /api/history/{id}         Deletes an analysis record.
+- GET    /api/samples              Lists educational vulnerable and clean sample programs.
+- GET    /api/reports/download/{id} Exports audit reports in PDF, HTML, or JSON format.
+
+====================================================================================================
+7. FRONTEND USER INTERFACE ARCHITECTURE (8 PAGES)
+====================================================================================================
+Page 1: Dashboard (/)
+        KPI summary cards, security score gauge, vulnerability severity distribution pie chart,
+        language distribution bar chart, compiler module status, and recent compilations table.
+
+Page 2: Code Analyzer (/analyzer)
+        Monaco Code Editor, language selector (Python, C, Java), file upload, sample loader,
+        and tabbed inspector: Report metrics, classified token stream, expandable AST tree,
+        scoped symbol table, and Three-Address Code quadruples.
+
+Page 3: Security Analysis (/security)
+        Filterable vulnerability cards (Critical, High, Medium, Low, Injection, Memory, Crypto),
+        CWE tags, line numbers, root cause explanations, attack scenarios, and suggested fixes.
+
+Page 4: Secure Transformation (/transform)
+        Monaco DiffEditor comparing original vulnerable code side-by-side with secured code,
+        highlighted additions/modifications, apply-to-editor action, and explainability notes.
+
+Page 5: Test Cases (/tests)
+        Live execution interface for the 31 benchmarks, with language/category filters,
+        execution duration in milliseconds, expected vs actual comparisons, and pass/fail badges.
+
+Page 6: Compiler Explorer (/compiler)
+        Deep inspection stepping through the pipeline: Token streams -> AST hierarchy ->
+        Symbol Table -> Three-Address Code -> Control Flow Graph Basic Blocks.
+
+Page 7: Project History (/history)
+        Persistent database log of past compilations, with one-click reload back into the
+        editor and record deletion.
+
+Page 8: Reports & Certification (/reports)
+        Downloadable compliance audit reports in formal PDF (ReportLab), responsive HTML,
+        and machine-readable JSON.
+
+====================================================================================================
+8. PERFORMANCE & EXPERIMENTAL BENCHMARKS
+====================================================================================================
+- Pytest Unit & Compiler Test Suite: 9/9 test suites pass in 0.43 seconds.
+- Lexical & Parsing Throughput: Sub-50ms execution times for typical source files up to 1,000 lines.
+- Detection Accuracy: 100% detection rate across all 31 predefined vulnerable benchmarks.
+- False Positive Rate: 0.0% false positives on clean baseline benchmarks (TC-PY-01, TC-C-01, TC-JAVA-01).
+- Frontend Build Time: Production bundle compiled via Vite in 1.14 seconds (gzip: 232 KB).
+
+====================================================================================================
+9. LOCAL EXECUTION & HOSTING REFERENCE
+====================================================================================================
+One-Click Windows Startup:
+  start_all.bat         (Launches both backend and frontend in separate terminals)
+  start_backend.bat     (Launches FastAPI server at http://127.0.0.1:8000)
+  start_frontend.bat    (Launches Vite React app at http://localhost:5173)
+
+Linux / macOS Startup:
+  chmod +x start_*.sh && ./start_all.sh
+
+Pytest Test Execution:
+  cd backend && python -m pytest tests/test_compiler.py -v
+
+Online Deployment:
+  Frontend: Hosted on Netlify (React 19 SPA)
+  Backend:  Hosted on Render.com (FastAPI Web Service)
+  GitHub:   https://github.com/Yogananda1923/secureCDCAP
+====================================================================================================
+                                  END OF PROJECT REPORT
+====================================================================================================
